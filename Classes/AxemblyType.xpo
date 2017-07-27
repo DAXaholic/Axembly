@@ -1,0 +1,174 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyType unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyType
+    PROPERTIES
+      Name                #AxemblyType
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents a CLR type within an Axembly assembly.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyType
+        #{
+        #    System.Type m_ClrType;
+        #
+        #    #localmacro.AddIfNonDefault
+        #    if (!prmisdefault(%2))
+        #    {
+        #        %1.Add(%2);
+        #    }
+        #    #endmacro
+        #}
+      ENDSOURCE
+      SOURCE #createInstance
+        #public CLRObject createInstance(
+        #    anytype _arg1 = null,
+        #    anytype _arg2 = null,
+        #    anytype _arg3 = null,
+        #    anytype _arg4 = null,
+        #    anytype _arg5 = null,
+        #    anytype _arg6 = null,
+        #    anytype _arg7 = null,
+        #    anytype _arg8 = null,
+        #    anytype _arg9 = null)
+        #{
+        #    System.Collections.ArrayList args;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    args = new System.Collections.ArrayList(9);
+        #    #AddIfNonDefault(args, _arg1)
+        #    #AddIfNonDefault(args, _arg2)
+        #    #AddIfNonDefault(args, _arg3)
+        #    #AddIfNonDefault(args, _arg4)
+        #    #AddIfNonDefault(args, _arg5)
+        #    #AddIfNonDefault(args, _arg6)
+        #    #AddIfNonDefault(args, _arg7)
+        #    #AddIfNonDefault(args, _arg8)
+        #    #AddIfNonDefault(args, _arg9)
+        #    return System.Activator::CreateInstance(m_ClrType, args.ToArray());
+        #}
+      ENDSOURCE
+      SOURCE #getClrType
+        #public System.Type getClrType()
+        #{
+        #    ;
+        #
+        #    return m_ClrType;
+        #}
+      ENDSOURCE
+      SOURCE #getName
+        #public str getName()
+        #{
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    return ClrInterop::getAnyTypeForObject(m_ClrType.get_Name());
+        #}
+      ENDSOURCE
+      SOURCE #invokeStatic
+        #public anytype invokeStatic(
+        #    str     _method,
+        #    anytype _arg1 = null,
+        #    anytype _arg2 = null,
+        #    anytype _arg3 = null,
+        #    anytype _arg4 = null,
+        #    anytype _arg5 = null,
+        #    anytype _arg6 = null,
+        #    anytype _arg7 = null,
+        #    anytype _arg8 = null,
+        #    anytype _arg9 = null)
+        #{
+        #    System.Reflection.MethodInfo methodInfo;
+        #    System.Collections.ArrayList args;
+        #    System.Type                  voidType;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    args = new System.Collections.ArrayList(9);
+        #    #AddIfNonDefault(args, _arg1)
+        #    #AddIfNonDefault(args, _arg2)
+        #    #AddIfNonDefault(args, _arg3)
+        #    #AddIfNonDefault(args, _arg4)
+        #    #AddIfNonDefault(args, _arg5)
+        #    #AddIfNonDefault(args, _arg6)
+        #    #AddIfNonDefault(args, _arg7)
+        #    #AddIfNonDefault(args, _arg8)
+        #    #AddIfNonDefault(args, _arg9)
+        #
+        #    methodInfo = m_ClrType.GetMethod(_method);
+        #    voidType = AxemblyType::clrTypeVoid();
+        #    if (voidType.Equals(methodInfo.get_ReturnType()))
+        #    {
+        #        methodInfo.Invoke(null, args.ToArray());
+        #        return null;
+        #    }
+        #    else
+        #    {
+        #        return methodInfo.Invoke(null, args.ToArray());
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setClrType
+        #private void setClrType(System.Type _clrType)
+        #{
+        #    ;
+        #
+        #    m_ClrType = _clrType;
+        #}
+      ENDSOURCE
+      SOURCE #clrTypeVoid
+        #private static System.Type clrTypeVoid()
+        #{
+        #    ;
+        #
+        #    return System.Type::GetType('System.Void');
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyType construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyType();
+        #}
+      ENDSOURCE
+      SOURCE #newFromClrType
+        #public static server AxemblyType newFromClrType(System.Type _clrType)
+        #{
+        #    AxemblyType instance;
+        #    ;
+        #
+        #    instance = AxemblyType::construct();
+        #    instance.setClrType(_clrType);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

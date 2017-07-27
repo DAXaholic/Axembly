@@ -1,0 +1,123 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyAssembly unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyAssembly
+    PROPERTIES
+      Name                #AxemblyAssembly
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents an assembly created by compiling Axembly sources.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyAssembly
+        #{
+        #    System.Byte[]              m_Bytes;
+        #    System.Reflection.Assembly m_ClrAssembly;
+        #}
+      ENDSOURCE
+      SOURCE #getBytes
+        #public System.Byte[] getBytes()
+        #{
+        #    ;
+        #
+        #    return m_Bytes;
+        #}
+      ENDSOURCE
+      SOURCE #getType
+        #public AxemblyType getType(str _name)
+        #{
+        #    System.Type clrType;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    this.loadAssemblyIfNecessary();
+        #    clrType = m_ClrAssembly.GetType(_name);
+        #    if (clrType != null)
+        #    {
+        #        return AxemblyType::newFromClrType(clrType);
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #loadAssemblyIfNecessary
+        #private void loadAssemblyIfNecessary()
+        #{
+        #    ;
+        #
+        #    if (m_ClrAssembly == null)
+        #    {
+        #        m_ClrAssembly = System.Reflection.Assembly::Load(m_Bytes);
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setBytes
+        #private void setBytes(System.Byte[] _bytes)
+        #{
+        #    ;
+        #
+        #    m_Bytes = _bytes;
+        #}
+      ENDSOURCE
+      SOURCE #setClrAssembly
+        #private void setClrAssembly(System.Reflection.Assembly _clrAssembly)
+        #{
+        #    ;
+        #
+        #    m_ClrAssembly = _clrAssembly;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyAssembly construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyAssembly();
+        #}
+      ENDSOURCE
+      SOURCE #newFromBytes
+        #public static server AxemblyAssembly newFromBytes(System.Byte[] _bytes)
+        #{
+        #    AxemblyAssembly instance;
+        #    ;
+        #
+        #    instance = AxemblyAssembly::construct();
+        #    instance.setBytes(_bytes);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromClrAssembly
+        #public static server AxemblyAssembly newFromClrAssembly(System.Reflection.Assembly _clrAssembly)
+        #{
+        #    AxemblyAssembly instance;
+        #    ;
+        #
+        #    instance = AxemblyAssembly::construct();
+        #    instance.setClrAssembly(_clrAssembly);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

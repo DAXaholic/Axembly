@@ -1,0 +1,269 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyCompiler unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyCompiler
+    PROPERTIES
+      Name                #AxemblyCompiler
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #buildResultFromAssemblyFile
+        #private AxemblyCompilationResult buildResultFromAssemblyFile(Filename _assemblyFile)
+        #{
+        #    System.Byte[] bytes;
+        #    AxemblyAssembly assembly;
+        #    ;
+        #
+        #    new FileIOPermission(_assemblyFile, 'r').assert();
+        #    bytes = System.IO.File::ReadAllBytes(_assemblyFile);
+        #    assembly = AxemblyAssembly::newFromBytes(bytes);
+        #    return AxemblyCompilationResult::newFromAssembly(assembly);
+        #}
+      ENDSOURCE
+      SOURCE #buildResultFromCodeDomErrors
+        #private AxemblyCompilationResult buildResultFromCodeDomErrors(
+        #    #CompilerNs(CompilerErrorCollection) codeDomErrors)
+        #{
+        #    int                        errorCount;
+        #    int                        i;
+        #    #CompilerNs(CompilerError) error;
+        #    str                        errorText;
+        #    int                        errorLine;
+        #    List                       errorMessages;
+        #    ;
+        #
+        #    errorCount = codeDomErrors.get_Count();
+        #    errorMessages = new List(Types::String);
+        #    for (i = 0; i < errorCount; ++i)
+        #    {
+        #        error = codeDomErrors.get_Item(i);
+        #        errorText = error.get_ErrorText();
+        #        errorLine = error.get_Line();
+        #        errorMessages.addEnd(strfmt('%1 (line %2)', errorText, errorLine));
+        #    }
+        #    return AxemblyCompilationResult::newFromErrors(errorMessages);
+        #}
+      ENDSOURCE
+      SOURCE #buildResultFromCodeDomResults
+        #private AxemblyCompilationResult buildResultFromCodeDomResults(
+        #    #CompilerNs(CompilerResults) _codeDomResults)
+        #{
+        #    #CompilerNs(CompilerErrorCollection) errors;
+        #    int                                  errorCount;
+        #    ;
+        #
+        #    errors = _codeDomResults.get_Errors();
+        #    errorCount = errors.get_Count();
+        #    if (errorCount > 0)
+        #    {
+        #        return this.buildResultFromCodeDomErrors(errors);
+        #    }
+        #    else
+        #    {
+        #        return this.buildResultFromAssemblyFile(_codeDomResults.get_PathToAssembly());
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #buildSourceStringArray
+        #private System.String[] buildSourceStringArray(List _sources)
+        #{
+        #    Enumerator      enm;
+        #    AxemblySource   source;
+        #    int             idx;
+        #    System.String[] ret;
+        #    ;
+        #
+        #    ret = new System.String[_sources.elements()]();
+        #    enm = _sources.getEnumerator();
+        #    for (idx = 0; enm.moveNext(); ++idx)
+        #    {
+        #        source = enm.current();
+        #        ret.SetValue(source.getSource(), idx);
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #buildTempPathForCompilation
+        #private System.String buildTempPathForCompilation()
+        #{
+        #    str           baseDir;
+        #    str           subDir;
+        #    System.String fullPath;
+        #    ;
+        #
+        #    baseDir = System.IO.Path::GetTempPath();
+        #    subDir = strfmt("%1_%2", Session::getAOSInstance(), sessionid());
+        #    fullPath = System.IO.Path::Combine(baseDir, subDir);
+        #    System.IO.Directory::CreateDirectory(fullPath);
+        #    return fullPath;
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Compiles Axembly sources to assemblies.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyCompiler
+        #{
+        #    str m_Language;
+        #
+        #    #Axembly
+        #
+        #    #define.CompilerNs (System.CodeDom.Compiler.%1)
+        #}
+      ENDSOURCE
+      SOURCE #compileSource
+        #public AxemblyCompilationResult compileSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return this.compileSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #compileSources
+        #public AxemblyCompilationResult compileSources(List _sources)
+        #{
+        #    ;
+        #
+        #    this.throwIfIncompatibleSources(_sources);
+        #    return this.compileSourcesViaCodeDom(_sources);
+        #}
+      ENDSOURCE
+      SOURCE #compileSourcesViaCodeDom
+        #private AxemblyCompilationResult compileSourcesViaCodeDom(List _sources)
+        #{
+        #    #CompilerNs(CodeDomProvider)    codeDomProvider;
+        #    System.String[]                 sourceStrings;
+        #    #CompilerNs(CompilerParameters) codeDomParameters;
+        #    System.String                   tempDir;
+        #    System.String                   sourceHash;
+        #    System.String                   outputFile;
+        #    #CompilerNs(CompilerResults)    codeDomResults;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    codeDomProvider = this.createCodeDomProvider();
+        #    sourceStrings = this.buildSourceStringArray(_sources);
+        #    codeDomParameters = new #CompilerNs(CompilerParameters)();
+        #    codeDomParameters.set_IncludeDebugInformation(false);
+        #    tempDir = this.buildTempPathForCompilation();
+        #    sourceHash = AxemblySource::sha1FromSources(_sources);
+        #    outputFile = System.IO.Path::Combine(tempDir, sourceHash);
+        #    codeDomParameters.set_OutputAssembly(outputFile);
+        #    codeDomResults = codeDomProvider.CompileAssemblyFromSource(
+        #        codeDomParameters,
+        #        sourceStrings);
+        #    return this.buildResultFromCodeDomResults(codeDomResults);
+        #}
+      ENDSOURCE
+      SOURCE #createCodeDomProvider
+        #private #CompilerNs(CodeDomProvider) createCodeDomProvider()
+        #{
+        #    ;
+        #
+        #    return #CompilerNs(CodeDomProvider)::CreateProvider(m_Language);
+        #}
+      ENDSOURCE
+      SOURCE #getLanguage
+        #public str getLanguage()
+        #{
+        #    ;
+        #
+        #    return m_Language;
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setLanguage
+        #private void setLanguage(str _language)
+        #{
+        #    ;
+        #
+        #    m_Language = _language;
+        #}
+      ENDSOURCE
+      SOURCE #throwIfIncompatibleSources
+        #private void throwIfIncompatibleSources(List _sources)
+        #{
+        #    Enumerator    enm;
+        #    AxemblySource source;
+        #    ;
+        #
+        #    enm = _sources.getEnumerator();
+        #    while (enm.moveNext())
+        #    {
+        #        source = enm.current();
+        #        if (source.getLanguage() != m_Language)
+        #        {
+        #            throw error(
+        #                strfmt("Sources contain incompatible language '%1'; expected '%2'",
+        #                       source.getLanguage(),
+        #                       m_Language));
+        #        }
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyCompiler construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyCompiler();
+        #}
+      ENDSOURCE
+      SOURCE #csCompiler
+        #public static server AxemblyCompiler csCompiler()
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(#LanguageCs);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromLanguage
+        #public static server AxemblyCompiler newFromLanguage(str _language)
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(_language);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #vbCompiler
+        #public static server AxemblyCompiler vbCompiler()
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(#LanguageVb);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

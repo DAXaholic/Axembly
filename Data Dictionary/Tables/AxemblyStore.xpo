@@ -1,0 +1,189 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : AxemblyStore unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #AxemblyStore
+    PROPERTIES
+      Name                #AxemblyStore
+      Label               #Axembly store of compiled assemblies
+      TitleField1         #Sha1
+      CreateRecIdIndex    #Yes
+      PrimaryIndex        #RecId
+      ClusterIndex        #RecId
+      ModifiedDateTime    #Yes
+      ModifiedBy          #Yes
+      CreatedDateTime     #Yes
+      CreatedBy           #Yes
+      DeveloperDocumentation  #Store of assemblies which are inserted after Axembly finishes compiling sources with an unknown hash.
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #Sha1
+        STRING
+        PROPERTIES
+          Name                #Sha1
+          Table               #AxemblyStore
+          ExtendedDataType    
+            ARRAY 
+              #AxemblySha1
+              #
+            ENDARRAY
+          StringSize          #40
+        ENDPROPERTIES
+        
+      FIELD #AssemblyBytes
+        STRING
+        PROPERTIES
+          Name                #AssemblyBytes
+          Table               #AxemblyStore
+          ExtendedDataType    
+            ARRAY 
+              #AxemblyBytesBase64
+              #
+            ENDARRAY
+          StringSize          #(Memo)
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+      GROUP #General
+        PROPERTIES
+          Name                #General
+          Label               #@SYS2952
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Identification
+        PROPERTIES
+          Name                #Identification
+          Label               #@SYS5711
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Overview
+        PROPERTIES
+          Name                #Overview
+          Label               #@SYS9039
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+    ENDGROUPS
+    
+    INDICES
+      #Sha1Idx
+      PROPERTIES
+        Name                #Sha1Idx
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #Sha1
+      ENDINDEXFIELDS
+      
+    ENDINDICES
+    REFERENCES
+    ENDREFERENCES
+    
+    DELETEACTIONS
+    ENDDELETEACTIONS
+    
+    METHODS
+      Version: 3
+      SOURCE #getAssemblyBytes
+        #public System.Byte[] getAssemblyBytes()
+        #{
+        #    System.Byte[] bytes;
+        #    ;
+        #
+        #    bytes = System.Convert::FromBase64String(this.AssemblyBytes);
+        #    return bytes;
+        #}
+      ENDSOURCE
+      SOURCE #setAssemblyBytes
+        #public void setAssemblyBytes(System.Byte[] _bytes)
+        #{
+        #    str base64;
+        #    ;
+        #
+        #    base64 = System.Convert::ToBase64String(_bytes);
+        #    this.AssemblyBytes = base64;
+        #}
+      ENDSOURCE
+      SOURCE #exist
+        #public static boolean exist(RecId _recId)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_recId != 0)
+        #    {
+        #        select firstOnly RecId
+        #            from tb
+        #            where tb.Recid == _recId;
+        #    }
+        #    return tb.RecId != 0;
+        #}
+      ENDSOURCE
+      SOURCE #existSha1
+        #public static boolean existSha1(AxemblySha1 _sha1)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_sha1 != '')
+        #    {
+        #        select firstOnly RecId
+        #            from tb
+        #            where tb.Sha1 == _sha1;
+        #    }
+        #    return tb.RecId != 0;
+        #}
+      ENDSOURCE
+      SOURCE #find
+        #public static AxemblyStore find(RecId _recId, boolean _forUpdate = false)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_recId != 0)
+        #    {
+        #        tb.selectForUpdate(_forUpdate);
+        #        select firstOnly tb
+        #            where tb.RecId == _recId;
+        #    }
+        #    return tb;
+        #}
+      ENDSOURCE
+      SOURCE #findAnySha1
+        #public static AxemblyStore findAnySha1(AxemblySha1 _sha1, boolean _forUpdate = false)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_sha1 != '')
+        #    {
+        #        tb.selectForUpdate(_forUpdate);
+        #        select firstOnly tb
+        #            where tb.Sha1 == _sha1;
+        #    }
+        #    return tb;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: END

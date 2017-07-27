@@ -1,0 +1,176 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblySource unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblySource
+    PROPERTIES
+      Name                #AxemblySource
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents a chunk of source code in Axembly.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblySource
+        #{
+        #    str m_Source;
+        #    str m_Language;
+        #
+        #    #Axembly
+        #}
+      ENDSOURCE
+      SOURCE #getLanguage
+        #public str getLanguage()
+        #{
+        #    ;
+        #
+        #    return m_Language;
+        #}
+      ENDSOURCE
+      SOURCE #getSource
+        #public str getSource()
+        #{
+        #    ;
+        #
+        #    return m_Source;
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setLanguage
+        #private void setLanguage(str _language)
+        #{
+        #    ;
+        #
+        #    m_Language = _language;
+        #}
+      ENDSOURCE
+      SOURCE #setSource
+        #private void setSource(str _source)
+        #{
+        #    ;
+        #
+        #    m_Source = _source;
+        #}
+      ENDSOURCE
+      SOURCE #concatSources
+        #private static System.String concatSources(List _sources)
+        #{
+        #    System.Text.StringBuilder concatenatedSources;
+        #    Enumerator                enmSource;
+        #    AxemblySource             source;
+        #    ;
+        #
+        #    concatenatedSources = new System.Text.StringBuilder();
+        #    enmSource = _sources.getEnumerator();
+        #    while (enmSource.moveNext())
+        #    {
+        #        source = enmSource.current();
+        #        concatenatedSources.Append(source.getSource());
+        #    }
+        #    return concatenatedSources.ToString();
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblySource construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblySource();
+        #}
+      ENDSOURCE
+      SOURCE #newFromCsSource
+        #/// <summary>
+        #///     Creates a new instance for a chunk of C# code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of C# code.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromCsSource(str _source)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageCs);
+        #}
+      ENDSOURCE
+      SOURCE #newFromSourceOfLanguage
+        #public static server AxemblySource newFromSourceOfLanguage(
+        #    str _source,
+        #    str _language)
+        #{
+        #    AxemblySource instance;
+        #    ;
+        #
+        #    instance = AxemblySource::construct();
+        #    instance.setSource(_source);
+        #    instance.setLanguage(_language);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromVbSource
+        #/// <summary>
+        #///     Creates a new instance for a chunk of VB.NET code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of VB.NET code.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromVbSource(Source _source)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageVb);
+        #}
+      ENDSOURCE
+      SOURCE #sha1FromSources
+        #public static AxemblySha1 sha1FromSources(List _sources)
+        #{
+        #    System.String                     sourceString;
+        #    System.Text.Encoding              utf8Encoding;
+        #    System.Byte[]                     utf8StrBytes;
+        #    System.Security.Cryptography.SHA1 sha1;
+        #    System.Byte[]                     hashBytes;
+        #    System.String                     hashAsHexStr;
+        #    str                               ret;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    sourceString = AxemblySource::concatSources(_sources);
+        #    utf8Encoding = System.Text.Encoding::get_UTF8();
+        #    utf8StrBytes = utf8Encoding.GetBytes(sourceString);
+        #
+        #    sha1 = System.Security.Cryptography.SHA1::Create();
+        #    hashBytes = sha1.ComputeHash(utf8StrBytes);
+        #    hashAsHexStr = System.BitConverter::ToString(hashBytes);
+        #    ret = hashAsHexStr.Replace('-', '');
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

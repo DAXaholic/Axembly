@@ -1,0 +1,36 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: DBE
+
+; Microsoft Dynamics AX Enumtype : AxemblyStoreMaintenanceType unloaded
+; --------------------------------------------------------------------------------
+  ENUMTYPEVERSION 1
+  
+  ENUMTYPE #AxemblyStoreMaintenanceType
+    PROPERTIES
+      Name                #AxemblyStoreMaintenanceType
+      Label               #Maintenance type
+      UseEnumValue        #Yes
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+      #RemoveDuplicates
+      PROPERTIES
+        Name                #RemoveDuplicates
+        Label               #Remove duplicates
+        EnumValue           #0
+      ENDPROPERTIES
+      
+      #ClearStore
+      PROPERTIES
+        Name                #ClearStore
+        Label               #Clear store
+        EnumValue           #1
+      ENDPROPERTIES
+      
+    ENDTYPEELEMENTS
+  ENDENUMTYPE
+  
+
+***Element: END

@@ -1,0 +1,186 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyStoreMaintenance unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyStoreMaintenance
+    PROPERTIES
+      Name                #AxemblyStoreMaintenance
+      Extends             #RunBaseBatch
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Maintains the Axembly store containing the created assemblies.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyStoreMaintenance extends RunBaseBatch
+        #{
+        #    AxemblyStoreMaintenanceType m_MaintenanceType;
+        #    DialogField                 m_DlgFldMaintenanceType;
+        #
+        #    #define.CurrentVersion (1)
+        #    #localmacro.CurrentList
+        #        m_MaintenanceType
+        #    #endmacro
+        #}
+      ENDSOURCE
+      SOURCE #clearStore
+        #private void clearStore()
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    delete_from store;
+        #}
+      ENDSOURCE
+      SOURCE #dialog
+        #protected Object dialog(DialogRunbase _dialog, boolean _forceOnClient)
+        #{
+        #    Dialog dlg;
+        #    ;
+        #
+        #    dlg = super(_dialog, _forceOnClient);
+        #    m_DlgFldMaintenanceType = dlg.addFieldValue(
+        #        typeid(AxemblyStoreMaintenanceType),
+        #        this.parmMaintenanceType());
+        #    return dlg;
+        #}
+      ENDSOURCE
+      SOURCE #getFromDialog
+        #public boolean getFromDialog()
+        #{
+        #    boolean ret;
+        #    ;
+        #
+        #    ret = super();
+        #    if (ret)
+        #    {
+        #        this.parmMaintenanceType(m_DlgFldMaintenanceType.value());
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #pack
+        #public container pack()
+        #{
+        #    ;
+        #
+        #    return [#CurrentVersion, #CurrentList];
+        #}
+      ENDSOURCE
+      SOURCE #parmMaintenanceType
+        #public AxemblyStoreMaintenanceType parmMaintenanceType(
+        #    AxemblyStoreMaintenanceType _maintenanceType = m_MaintenanceType)
+        #{
+        #    ;
+        #
+        #    m_MaintenanceType = _maintenanceType;
+        #    return m_MaintenanceType;
+        #}
+      ENDSOURCE
+      SOURCE #removeDuplicates
+        #private void removeDuplicates()
+        #{
+        #    AxemblyStore maxRecIdPerHash;
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    while select Sha1, maxof(RecId)
+        #        from maxRecIdPerHash
+        #        group by Sha1
+        #    {
+        #        delete_from store
+        #            where store.Sha1  == maxRecIdPerHash.Sha1
+        #               && store.RecId != maxRecIdPerHash.RecId;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #run
+        #public void run()
+        #{
+        #    ;
+        #
+        #    super();
+        #    setprefix(this.caption());
+        #    switch (m_MaintenanceType)
+        #    {
+        #        case AxemblyStoreMaintenanceType::RemoveDuplicates:
+        #            this.removeDuplicates();
+        #            break;
+        #
+        #        case AxemblyStoreMaintenanceType::ClearStore:
+        #            this.clearStore();
+        #            break;
+        #
+        #        default:
+        #            throw error("Unsupported maintenace type");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #unpack
+        #public boolean unpack(container _packedObj)
+        #{
+        #    Version v;
+        #    boolean ret;
+        #    ;
+        #
+        #    v = RunBase::getVersion(_packedObj);
+        #    switch (v)
+        #    {
+        #        case #CurrentVersion:
+        #            [v, #CurrentList] = _packedObj;
+        #            ret = true;
+        #            break;
+        #
+        #        default:
+        #            ret = false;
+        #            break;
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #public static server AxemblyStoreMaintenance construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyStoreMaintenance();
+        #}
+      ENDSOURCE
+      SOURCE #description
+        #public static ClassDescription description()
+        #{
+        #    ;
+        #
+        #    //BP deviation documented
+        #    return "Maintain Axembly Store";
+        #}
+      ENDSOURCE
+      SOURCE #main
+        #public static void main(Args _args)
+        #{
+        #    AxemblyStoreMaintenance instance;
+        #    ;
+        #
+        #    instance = AxemblyStoreMaintenance::construct();
+        #    if (instance.prompt())
+        #    {
+        #        instance.run();
+        #    }
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

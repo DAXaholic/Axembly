@@ -1,0 +1,23 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: MCR
+
+; Microsoft Dynamics AX Macro: Axembly unloaded
+; --------------------------------------------------------------------------------
+  JOBVERSION 1
+  
+  SOURCE #Axembly
+    #/// <summary>
+    #///     Constants of Axembly.
+    #/// </summary>
+    #/// <remarks>
+    #///     Copyright (c) 2017 Aaron Kunz
+    #///     https://github.com/DAXaholic/Axembly
+    #/// </remarks>
+    #
+    ##define.LanguageCs ('C#')
+    ##define.LanguageVb ('VB')
+  ENDSOURCE
+
+***Element: END

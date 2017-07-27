@@ -1,0 +1,114 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyCompilationResult unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyCompilationResult
+    PROPERTIES
+      Name                #AxemblyCompilationResult
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents the result of compiling Axembly sources.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyCompilationResult
+        #{
+        #    AxemblyAssembly m_Assembly;
+        #    List            m_Errors;
+        #}
+      ENDSOURCE
+      SOURCE #getAssembly
+        #public AxemblyAssembly getAssembly()
+        #{
+        #    ;
+        #
+        #    return m_Assembly;
+        #}
+      ENDSOURCE
+      SOURCE #getErrors
+        #public List getErrors()
+        #{
+        #    ;
+        #
+        #    return m_Errors;
+        #}
+      ENDSOURCE
+      SOURCE #hasErrors
+        #public boolean hasErrors()
+        #{
+        #    ;
+        #
+        #    return !m_Errors.empty();
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #
+        #    m_Errors   = new List(Types::Class);
+        #}
+      ENDSOURCE
+      SOURCE #setAssembly
+        #private void setAssembly(AxemblyAssembly _assembly)
+        #{
+        #    ;
+        #
+        #    m_Assembly = _assembly;
+        #}
+      ENDSOURCE
+      SOURCE #setErrors
+        #private void setErrors(List _errors)
+        #{
+        #    ;
+        #
+        #    m_Errors = _errors;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyCompilationResult construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyCompilationResult();
+        #}
+      ENDSOURCE
+      SOURCE #newFromAssembly
+        #public static server AxemblyCompilationResult newFromAssembly(AxemblyAssembly _assembly)
+        #{
+        #    AxemblyCompilationResult instance;
+        #    ;
+        #
+        #    instance = AxemblyCompilationResult::construct();
+        #    instance.setAssembly(_assembly);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromErrors
+        #public static server AxemblyCompilationResult newFromErrors(List _errors)
+        #{
+        #    AxemblyCompilationResult instance;
+        #    ;
+        #
+        #    instance = AxemblyCompilationResult::construct();
+        #    instance.setErrors(_errors);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

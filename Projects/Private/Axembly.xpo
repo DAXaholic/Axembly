@@ -1,0 +1,1697 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: MCR
+
+; Microsoft Dynamics AX Macro: Axembly unloaded
+; --------------------------------------------------------------------------------
+  JOBVERSION 1
+  
+  SOURCE #Axembly
+    #/// <summary>
+    #///     Constants of Axembly.
+    #/// </summary>
+    #/// <remarks>
+    #///     Copyright (c) 2017 Aaron Kunz
+    #///     https://github.com/DAXaholic/Axembly
+    #/// </remarks>
+    #
+    ##define.LanguageCs ('C#')
+    ##define.LanguageVb ('VB')
+  ENDSOURCE
+
+***Element: DBE
+
+; Microsoft Dynamics AX Enumtype : AxemblyStoreMaintenanceType unloaded
+; --------------------------------------------------------------------------------
+  ENUMTYPEVERSION 1
+  
+  ENUMTYPE #AxemblyStoreMaintenanceType
+    PROPERTIES
+      Name                #AxemblyStoreMaintenanceType
+      Label               #Maintenance type
+      UseEnumValue        #Yes
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+      #RemoveDuplicates
+      PROPERTIES
+        Name                #RemoveDuplicates
+        Label               #Remove duplicates
+        EnumValue           #0
+      ENDPROPERTIES
+      
+      #ClearStore
+      PROPERTIES
+        Name                #ClearStore
+        Label               #Clear store
+        EnumValue           #1
+      ENDPROPERTIES
+      
+    ENDTYPEELEMENTS
+  ENDENUMTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics AX String: AxemblySha1 unloaded
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #AxemblySha1
+  STRING
+    PROPERTIES
+      Name                #AxemblySha1
+      Label               #SHA1
+      HelpText            #SHA1 based hash value of sources
+      StringSize          #40
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: UTS
+
+; Microsoft Dynamics AX String: AxemblyBytesBase64 unloaded
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #AxemblyBytesBase64
+  STRING
+    PROPERTIES
+      Name                #AxemblyBytesBase64
+      Label               #Bytes Base64
+      HelpText            #Binary data encoded in Base64.
+      StringSize          #(Memo)
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : AxemblyStore unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #AxemblyStore
+    PROPERTIES
+      Name                #AxemblyStore
+      Label               #Axembly store of compiled assemblies
+      TitleField1         #Sha1
+      CreateRecIdIndex    #Yes
+      PrimaryIndex        #RecId
+      ClusterIndex        #RecId
+      ModifiedDateTime    #Yes
+      ModifiedBy          #Yes
+      CreatedDateTime     #Yes
+      CreatedBy           #Yes
+      DeveloperDocumentation  #Store of assemblies which are inserted after Axembly finishes compiling sources with an unknown hash.
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #Sha1
+        STRING
+        PROPERTIES
+          Name                #Sha1
+          Table               #AxemblyStore
+          ExtendedDataType    
+            ARRAY 
+              #AxemblySha1
+              #
+            ENDARRAY
+          StringSize          #40
+        ENDPROPERTIES
+        
+      FIELD #AssemblyBytes
+        STRING
+        PROPERTIES
+          Name                #AssemblyBytes
+          Table               #AxemblyStore
+          ExtendedDataType    
+            ARRAY 
+              #AxemblyBytesBase64
+              #
+            ENDARRAY
+          StringSize          #(Memo)
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+      GROUP #General
+        PROPERTIES
+          Name                #General
+          Label               #@SYS2952
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Identification
+        PROPERTIES
+          Name                #Identification
+          Label               #@SYS5711
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Overview
+        PROPERTIES
+          Name                #Overview
+          Label               #@SYS9039
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sha1
+        ENDGROUPFIELDS
+      ENDGROUP
+    ENDGROUPS
+    
+    INDICES
+      #Sha1Idx
+      PROPERTIES
+        Name                #Sha1Idx
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #Sha1
+      ENDINDEXFIELDS
+      
+    ENDINDICES
+    REFERENCES
+    ENDREFERENCES
+    
+    DELETEACTIONS
+    ENDDELETEACTIONS
+    
+    METHODS
+      Version: 3
+      SOURCE #getAssemblyBytes
+        #public System.Byte[] getAssemblyBytes()
+        #{
+        #    System.Byte[] bytes;
+        #    ;
+        #
+        #    bytes = System.Convert::FromBase64String(this.AssemblyBytes);
+        #    return bytes;
+        #}
+      ENDSOURCE
+      SOURCE #setAssemblyBytes
+        #public void setAssemblyBytes(System.Byte[] _bytes)
+        #{
+        #    str base64;
+        #    ;
+        #
+        #    base64 = System.Convert::ToBase64String(_bytes);
+        #    this.AssemblyBytes = base64;
+        #}
+      ENDSOURCE
+      SOURCE #exist
+        #public static boolean exist(RecId _recId)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_recId != 0)
+        #    {
+        #        select firstOnly RecId
+        #            from tb
+        #            where tb.Recid == _recId;
+        #    }
+        #    return tb.RecId != 0;
+        #}
+      ENDSOURCE
+      SOURCE #existSha1
+        #public static boolean existSha1(AxemblySha1 _sha1)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_sha1 != '')
+        #    {
+        #        select firstOnly RecId
+        #            from tb
+        #            where tb.Sha1 == _sha1;
+        #    }
+        #    return tb.RecId != 0;
+        #}
+      ENDSOURCE
+      SOURCE #find
+        #public static AxemblyStore find(RecId _recId, boolean _forUpdate = false)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_recId != 0)
+        #    {
+        #        tb.selectForUpdate(_forUpdate);
+        #        select firstOnly tb
+        #            where tb.RecId == _recId;
+        #    }
+        #    return tb;
+        #}
+      ENDSOURCE
+      SOURCE #findAnySha1
+        #public static AxemblyStore findAnySha1(AxemblySha1 _sha1, boolean _forUpdate = false)
+        #{
+        #    AxemblyStore tb;
+        #    ;
+        #
+        #    if (_sha1 != '')
+        #    {
+        #        tb.selectForUpdate(_forUpdate);
+        #        select firstOnly tb
+        #            where tb.Sha1 == _sha1;
+        #    }
+        #    return tb;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: Axembly unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #Axembly
+    PROPERTIES
+      Name                #Axembly
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Provides assemblies for Axembly sources either by retrieving them
+        #///     from cache or compiling them.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final abstract class Axembly
+        #{
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #assemblyCache
+        #private static server Map assemblyCache()
+        #{
+        #    SysGlobalCache cache;
+        #    ;
+        #
+        #    cache = classFactory.globalCache();
+        #    if (!cache.isSet(classstr(Axembly), staticmethodstr(Axembly, assemblyCache)))
+        #    {
+        #        cache.set(
+        #            classstr(Axembly),
+        #            staticmethodstr(Axembly, assemblyCache),
+        #            new Map(Types::String, Types::Class));
+        #    }
+        #    return cache.get(classstr(Axembly), staticmethodstr(Axembly, assemblyCache));
+        #}
+      ENDSOURCE
+      SOURCE #assemblyFromSource
+        #public static server AxemblyAssembly assemblyFromSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return Axembly::assemblyFromSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #assemblyFromSources
+        #public static server AxemblyAssembly assemblyFromSources(List _sources)
+        #{
+        #    AxemblySha1     sourceHash;
+        #    AxemblyAssembly assembly;
+        #    ;
+        #
+        #    sourceHash = AxemblySource::sha1FromSources(_sources);
+        #
+        #    assembly = Axembly::getCachedAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::getLoadedAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::getStoredAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::buildAssemblyFromSources(_sources);
+        #    Axembly::storeAssemblyWithSourceHash(assembly, sourceHash);
+        #    Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #    return assembly;
+        #}
+      ENDSOURCE
+      SOURCE #buildAssemblyFromSource
+        #private static server AxemblyAssembly buildAssemblyFromSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return Axembly::buildAssemblyFromSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #buildAssemblyFromSources
+        #private static server AxemblyAssembly buildAssemblyFromSources(List _sources)
+        #{
+        #    Enumerator               enmSources;
+        #    AxemblySource            firstSource;
+        #    AxemblyCompiler          compiler;
+        #    AxemblyCompilationResult compilationResult;
+        #    Enumerator               enmErrors;
+        #    ;
+        #
+        #    enmSources = _sources.getEnumerator();
+        #    if (!enmSources.moveNext())
+        #    {
+        #        throw error("Could not build assembly due to empty list of sources.");
+        #    }
+        #    firstSource = enmSources.current();
+        #
+        #    compiler = AxemblyCompiler::newFromLanguage(firstSource.getLanguage());
+        #    compilationResult = compiler.compileSources(_sources);
+        #    if (compilationResult.hasErrors())
+        #    {
+        #        enmErrors = compilationResult.getErrors().getEnumerator();
+        #        while (enmErrors.moveNext())
+        #        {
+        #            error(enmErrors.current());
+        #        }
+        #        throw error("Could not build assembly due to errors.");
+        #    }
+        #
+        #    return compilationResult.getAssembly();
+        #}
+      ENDSOURCE
+      SOURCE #cacheAssemblyWithSourceHash
+        #private static server void cacheAssemblyWithSourceHash(
+        #    AxemblyAssembly _assembly,
+        #    AxemblySha1     _sourceHash)
+        #{
+        #    Map cache;
+        #    ;
+        #
+        #    cache = Axembly::assemblyCache();
+        #    cache.insert(_sourceHash, _assembly);
+        #}
+      ENDSOURCE
+      SOURCE #getCachedAssemblyFromSourceHash
+        #private static server AxemblyAssembly getCachedAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    Map cache;
+        #    ;
+        #
+        #    cache = Axembly::assemblyCache();
+        #    if (cache.exists(_sourceHash))
+        #    {
+        #        return cache.lookup(_sourceHash);
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #getLoadedAssemblyFromSourceHash
+        #private static server AxemblyAssembly getLoadedAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    System.AppDomain               appDomain;
+        #    System.Reflection.Assembly[]   assemblies;
+        #    int                            assemblyCount;
+        #    int                            assemblyIdx;
+        #    System.Reflection.Assembly     assembly;
+        #    System.Reflection.AssemblyName assemblyName;
+        #    str                            name;
+        #    ;
+        #
+        #    appDomain = System.AppDomain::get_CurrentDomain();
+        #    assemblies = appDomain.GetAssemblies();
+        #
+        #    // -- Iterate backwards as new assemblies are located at the end
+        #    assemblyCount = assemblies.get_Length();
+        #    for (assemblyIdx = assemblyCount - 1;
+        #         assemblyIdx >= 0;
+        #         --assemblyIdx)
+        #    {
+        #        assembly = assemblies.GetValue(assemblyIdx);
+        #        assemblyName = assembly.GetName();
+        #        name = assemblyName.get_Name();
+        #        if (name == _sourceHash)
+        #        {
+        #            return AxemblyAssembly::newFromClrAssembly(assembly);
+        #        }
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #getStoredAssemblyFromSourceHash
+        #private static server AxemblyAssembly getStoredAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    store = AxemblyStore::findAnySha1(_sourceHash);
+        #    if (store.RecId != 0)
+        #    {
+        #        return AxemblyAssembly::newFromBytes(store.getAssemblyBytes());
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #storeAssemblyWithSourceHash
+        #private static server void storeAssemblyWithSourceHash(
+        #    AxemblyAssembly _assembly,
+        #    AxemblySha1     _sourceHash)
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    ttsbegin;
+        #    store.initValue();
+        #    store.setAssemblyBytes(_assembly.getBytes());
+        #    store.Sha1 = _sourceHash;
+        #    store.insert();
+        #    ttscommit;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyAssembly unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyAssembly
+    PROPERTIES
+      Name                #AxemblyAssembly
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents an assembly created by compiling Axembly sources.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyAssembly
+        #{
+        #    System.Byte[]              m_Bytes;
+        #    System.Reflection.Assembly m_ClrAssembly;
+        #}
+      ENDSOURCE
+      SOURCE #getBytes
+        #public System.Byte[] getBytes()
+        #{
+        #    ;
+        #
+        #    return m_Bytes;
+        #}
+      ENDSOURCE
+      SOURCE #getType
+        #public AxemblyType getType(str _name)
+        #{
+        #    System.Type clrType;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    this.loadAssemblyIfNecessary();
+        #    clrType = m_ClrAssembly.GetType(_name);
+        #    if (clrType != null)
+        #    {
+        #        return AxemblyType::newFromClrType(clrType);
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #loadAssemblyIfNecessary
+        #private void loadAssemblyIfNecessary()
+        #{
+        #    ;
+        #
+        #    if (m_ClrAssembly == null)
+        #    {
+        #        m_ClrAssembly = System.Reflection.Assembly::Load(m_Bytes);
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setBytes
+        #private void setBytes(System.Byte[] _bytes)
+        #{
+        #    ;
+        #
+        #    m_Bytes = _bytes;
+        #}
+      ENDSOURCE
+      SOURCE #setClrAssembly
+        #private void setClrAssembly(System.Reflection.Assembly _clrAssembly)
+        #{
+        #    ;
+        #
+        #    m_ClrAssembly = _clrAssembly;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyAssembly construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyAssembly();
+        #}
+      ENDSOURCE
+      SOURCE #newFromBytes
+        #public static server AxemblyAssembly newFromBytes(System.Byte[] _bytes)
+        #{
+        #    AxemblyAssembly instance;
+        #    ;
+        #
+        #    instance = AxemblyAssembly::construct();
+        #    instance.setBytes(_bytes);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromClrAssembly
+        #public static server AxemblyAssembly newFromClrAssembly(System.Reflection.Assembly _clrAssembly)
+        #{
+        #    AxemblyAssembly instance;
+        #    ;
+        #
+        #    instance = AxemblyAssembly::construct();
+        #    instance.setClrAssembly(_clrAssembly);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyCompiler unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyCompiler
+    PROPERTIES
+      Name                #AxemblyCompiler
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #buildResultFromAssemblyFile
+        #private AxemblyCompilationResult buildResultFromAssemblyFile(Filename _assemblyFile)
+        #{
+        #    System.Byte[] bytes;
+        #    AxemblyAssembly assembly;
+        #    ;
+        #
+        #    new FileIOPermission(_assemblyFile, 'r').assert();
+        #    bytes = System.IO.File::ReadAllBytes(_assemblyFile);
+        #    assembly = AxemblyAssembly::newFromBytes(bytes);
+        #    return AxemblyCompilationResult::newFromAssembly(assembly);
+        #}
+      ENDSOURCE
+      SOURCE #buildResultFromCodeDomErrors
+        #private AxemblyCompilationResult buildResultFromCodeDomErrors(
+        #    #CompilerNs(CompilerErrorCollection) codeDomErrors)
+        #{
+        #    int                        errorCount;
+        #    int                        i;
+        #    #CompilerNs(CompilerError) error;
+        #    str                        errorText;
+        #    int                        errorLine;
+        #    List                       errorMessages;
+        #    ;
+        #
+        #    errorCount = codeDomErrors.get_Count();
+        #    errorMessages = new List(Types::String);
+        #    for (i = 0; i < errorCount; ++i)
+        #    {
+        #        error = codeDomErrors.get_Item(i);
+        #        errorText = error.get_ErrorText();
+        #        errorLine = error.get_Line();
+        #        errorMessages.addEnd(strfmt('%1 (line %2)', errorText, errorLine));
+        #    }
+        #    return AxemblyCompilationResult::newFromErrors(errorMessages);
+        #}
+      ENDSOURCE
+      SOURCE #buildResultFromCodeDomResults
+        #private AxemblyCompilationResult buildResultFromCodeDomResults(
+        #    #CompilerNs(CompilerResults) _codeDomResults)
+        #{
+        #    #CompilerNs(CompilerErrorCollection) errors;
+        #    int                                  errorCount;
+        #    ;
+        #
+        #    errors = _codeDomResults.get_Errors();
+        #    errorCount = errors.get_Count();
+        #    if (errorCount > 0)
+        #    {
+        #        return this.buildResultFromCodeDomErrors(errors);
+        #    }
+        #    else
+        #    {
+        #        return this.buildResultFromAssemblyFile(_codeDomResults.get_PathToAssembly());
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #buildSourceStringArray
+        #private System.String[] buildSourceStringArray(List _sources)
+        #{
+        #    Enumerator      enm;
+        #    AxemblySource   source;
+        #    int             idx;
+        #    System.String[] ret;
+        #    ;
+        #
+        #    ret = new System.String[_sources.elements()]();
+        #    enm = _sources.getEnumerator();
+        #    for (idx = 0; enm.moveNext(); ++idx)
+        #    {
+        #        source = enm.current();
+        #        ret.SetValue(source.getSource(), idx);
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #buildTempPathForCompilation
+        #private System.String buildTempPathForCompilation()
+        #{
+        #    str           baseDir;
+        #    str           subDir;
+        #    System.String fullPath;
+        #    ;
+        #
+        #    baseDir = System.IO.Path::GetTempPath();
+        #    subDir = strfmt("%1_%2", Session::getAOSInstance(), sessionid());
+        #    fullPath = System.IO.Path::Combine(baseDir, subDir);
+        #    System.IO.Directory::CreateDirectory(fullPath);
+        #    return fullPath;
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Compiles Axembly sources to assemblies.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyCompiler
+        #{
+        #    str m_Language;
+        #
+        #    #Axembly
+        #
+        #    #define.CompilerNs (System.CodeDom.Compiler.%1)
+        #}
+      ENDSOURCE
+      SOURCE #compileSource
+        #public AxemblyCompilationResult compileSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return this.compileSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #compileSources
+        #public AxemblyCompilationResult compileSources(List _sources)
+        #{
+        #    ;
+        #
+        #    this.throwIfIncompatibleSources(_sources);
+        #    return this.compileSourcesViaCodeDom(_sources);
+        #}
+      ENDSOURCE
+      SOURCE #compileSourcesViaCodeDom
+        #private AxemblyCompilationResult compileSourcesViaCodeDom(List _sources)
+        #{
+        #    #CompilerNs(CodeDomProvider)    codeDomProvider;
+        #    System.String[]                 sourceStrings;
+        #    #CompilerNs(CompilerParameters) codeDomParameters;
+        #    System.String                   tempDir;
+        #    System.String                   sourceHash;
+        #    System.String                   outputFile;
+        #    #CompilerNs(CompilerResults)    codeDomResults;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    codeDomProvider = this.createCodeDomProvider();
+        #    sourceStrings = this.buildSourceStringArray(_sources);
+        #    codeDomParameters = new #CompilerNs(CompilerParameters)();
+        #    codeDomParameters.set_IncludeDebugInformation(false);
+        #    tempDir = this.buildTempPathForCompilation();
+        #    sourceHash = AxemblySource::sha1FromSources(_sources);
+        #    outputFile = System.IO.Path::Combine(tempDir, sourceHash);
+        #    codeDomParameters.set_OutputAssembly(outputFile);
+        #    codeDomResults = codeDomProvider.CompileAssemblyFromSource(
+        #        codeDomParameters,
+        #        sourceStrings);
+        #    return this.buildResultFromCodeDomResults(codeDomResults);
+        #}
+      ENDSOURCE
+      SOURCE #createCodeDomProvider
+        #private #CompilerNs(CodeDomProvider) createCodeDomProvider()
+        #{
+        #    ;
+        #
+        #    return #CompilerNs(CodeDomProvider)::CreateProvider(m_Language);
+        #}
+      ENDSOURCE
+      SOURCE #getLanguage
+        #public str getLanguage()
+        #{
+        #    ;
+        #
+        #    return m_Language;
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setLanguage
+        #private void setLanguage(str _language)
+        #{
+        #    ;
+        #
+        #    m_Language = _language;
+        #}
+      ENDSOURCE
+      SOURCE #throwIfIncompatibleSources
+        #private void throwIfIncompatibleSources(List _sources)
+        #{
+        #    Enumerator    enm;
+        #    AxemblySource source;
+        #    ;
+        #
+        #    enm = _sources.getEnumerator();
+        #    while (enm.moveNext())
+        #    {
+        #        source = enm.current();
+        #        if (source.getLanguage() != m_Language)
+        #        {
+        #            throw error(
+        #                strfmt("Sources contain incompatible language '%1'; expected '%2'",
+        #                       source.getLanguage(),
+        #                       m_Language));
+        #        }
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyCompiler construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyCompiler();
+        #}
+      ENDSOURCE
+      SOURCE #csCompiler
+        #public static server AxemblyCompiler csCompiler()
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(#LanguageCs);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromLanguage
+        #public static server AxemblyCompiler newFromLanguage(str _language)
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(_language);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #vbCompiler
+        #public static server AxemblyCompiler vbCompiler()
+        #{
+        #    AxemblyCompiler instance;
+        #    ;
+        #
+        #    instance = AxemblyCompiler::construct();
+        #    instance.setLanguage(#LanguageVb);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyCompilationResult unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyCompilationResult
+    PROPERTIES
+      Name                #AxemblyCompilationResult
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents the result of compiling Axembly sources.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyCompilationResult
+        #{
+        #    AxemblyAssembly m_Assembly;
+        #    List            m_Errors;
+        #}
+      ENDSOURCE
+      SOURCE #getAssembly
+        #public AxemblyAssembly getAssembly()
+        #{
+        #    ;
+        #
+        #    return m_Assembly;
+        #}
+      ENDSOURCE
+      SOURCE #getErrors
+        #public List getErrors()
+        #{
+        #    ;
+        #
+        #    return m_Errors;
+        #}
+      ENDSOURCE
+      SOURCE #hasErrors
+        #public boolean hasErrors()
+        #{
+        #    ;
+        #
+        #    return !m_Errors.empty();
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #
+        #    m_Errors   = new List(Types::Class);
+        #}
+      ENDSOURCE
+      SOURCE #setAssembly
+        #private void setAssembly(AxemblyAssembly _assembly)
+        #{
+        #    ;
+        #
+        #    m_Assembly = _assembly;
+        #}
+      ENDSOURCE
+      SOURCE #setErrors
+        #private void setErrors(List _errors)
+        #{
+        #    ;
+        #
+        #    m_Errors = _errors;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyCompilationResult construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyCompilationResult();
+        #}
+      ENDSOURCE
+      SOURCE #newFromAssembly
+        #public static server AxemblyCompilationResult newFromAssembly(AxemblyAssembly _assembly)
+        #{
+        #    AxemblyCompilationResult instance;
+        #    ;
+        #
+        #    instance = AxemblyCompilationResult::construct();
+        #    instance.setAssembly(_assembly);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromErrors
+        #public static server AxemblyCompilationResult newFromErrors(List _errors)
+        #{
+        #    AxemblyCompilationResult instance;
+        #    ;
+        #
+        #    instance = AxemblyCompilationResult::construct();
+        #    instance.setErrors(_errors);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblySource unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblySource
+    PROPERTIES
+      Name                #AxemblySource
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents a chunk of source code in Axembly.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblySource
+        #{
+        #    str m_Source;
+        #    str m_Language;
+        #
+        #    #Axembly
+        #}
+      ENDSOURCE
+      SOURCE #getLanguage
+        #public str getLanguage()
+        #{
+        #    ;
+        #
+        #    return m_Language;
+        #}
+      ENDSOURCE
+      SOURCE #getSource
+        #public str getSource()
+        #{
+        #    ;
+        #
+        #    return m_Source;
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setLanguage
+        #private void setLanguage(str _language)
+        #{
+        #    ;
+        #
+        #    m_Language = _language;
+        #}
+      ENDSOURCE
+      SOURCE #setSource
+        #private void setSource(str _source)
+        #{
+        #    ;
+        #
+        #    m_Source = _source;
+        #}
+      ENDSOURCE
+      SOURCE #concatSources
+        #private static System.String concatSources(List _sources)
+        #{
+        #    System.Text.StringBuilder concatenatedSources;
+        #    Enumerator                enmSource;
+        #    AxemblySource             source;
+        #    ;
+        #
+        #    concatenatedSources = new System.Text.StringBuilder();
+        #    enmSource = _sources.getEnumerator();
+        #    while (enmSource.moveNext())
+        #    {
+        #        source = enmSource.current();
+        #        concatenatedSources.Append(source.getSource());
+        #    }
+        #    return concatenatedSources.ToString();
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblySource construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblySource();
+        #}
+      ENDSOURCE
+      SOURCE #newFromCsSource
+        #/// <summary>
+        #///     Creates a new instance for a chunk of C# code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of C# code.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromCsSource(str _source)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageCs);
+        #}
+      ENDSOURCE
+      SOURCE #newFromSourceOfLanguage
+        #public static server AxemblySource newFromSourceOfLanguage(
+        #    str _source,
+        #    str _language)
+        #{
+        #    AxemblySource instance;
+        #    ;
+        #
+        #    instance = AxemblySource::construct();
+        #    instance.setSource(_source);
+        #    instance.setLanguage(_language);
+        #    return instance;
+        #}
+      ENDSOURCE
+      SOURCE #newFromVbSource
+        #/// <summary>
+        #///     Creates a new instance for a chunk of VB.NET code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of VB.NET code.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromVbSource(Source _source)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageVb);
+        #}
+      ENDSOURCE
+      SOURCE #sha1FromSources
+        #public static AxemblySha1 sha1FromSources(List _sources)
+        #{
+        #    System.String                     sourceString;
+        #    System.Text.Encoding              utf8Encoding;
+        #    System.Byte[]                     utf8StrBytes;
+        #    System.Security.Cryptography.SHA1 sha1;
+        #    System.Byte[]                     hashBytes;
+        #    System.String                     hashAsHexStr;
+        #    str                               ret;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    sourceString = AxemblySource::concatSources(_sources);
+        #    utf8Encoding = System.Text.Encoding::get_UTF8();
+        #    utf8StrBytes = utf8Encoding.GetBytes(sourceString);
+        #
+        #    sha1 = System.Security.Cryptography.SHA1::Create();
+        #    hashBytes = sha1.ComputeHash(utf8StrBytes);
+        #    hashAsHexStr = System.BitConverter::ToString(hashBytes);
+        #    ret = hashAsHexStr.Replace('-', '');
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyStoreMaintenance unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyStoreMaintenance
+    PROPERTIES
+      Name                #AxemblyStoreMaintenance
+      Extends             #RunBaseBatch
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Maintains the Axembly store containing the created assemblies.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyStoreMaintenance extends RunBaseBatch
+        #{
+        #    AxemblyStoreMaintenanceType m_MaintenanceType;
+        #    DialogField                 m_DlgFldMaintenanceType;
+        #
+        #    #define.CurrentVersion (1)
+        #    #localmacro.CurrentList
+        #        m_MaintenanceType
+        #    #endmacro
+        #}
+      ENDSOURCE
+      SOURCE #clearStore
+        #private void clearStore()
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    delete_from store;
+        #}
+      ENDSOURCE
+      SOURCE #dialog
+        #protected Object dialog(DialogRunbase _dialog, boolean _forceOnClient)
+        #{
+        #    Dialog dlg;
+        #    ;
+        #
+        #    dlg = super(_dialog, _forceOnClient);
+        #    m_DlgFldMaintenanceType = dlg.addFieldValue(
+        #        typeid(AxemblyStoreMaintenanceType),
+        #        this.parmMaintenanceType());
+        #    return dlg;
+        #}
+      ENDSOURCE
+      SOURCE #getFromDialog
+        #public boolean getFromDialog()
+        #{
+        #    boolean ret;
+        #    ;
+        #
+        #    ret = super();
+        #    if (ret)
+        #    {
+        #        this.parmMaintenanceType(m_DlgFldMaintenanceType.value());
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #pack
+        #public container pack()
+        #{
+        #    ;
+        #
+        #    return [#CurrentVersion, #CurrentList];
+        #}
+      ENDSOURCE
+      SOURCE #parmMaintenanceType
+        #public AxemblyStoreMaintenanceType parmMaintenanceType(
+        #    AxemblyStoreMaintenanceType _maintenanceType = m_MaintenanceType)
+        #{
+        #    ;
+        #
+        #    m_MaintenanceType = _maintenanceType;
+        #    return m_MaintenanceType;
+        #}
+      ENDSOURCE
+      SOURCE #removeDuplicates
+        #private void removeDuplicates()
+        #{
+        #    AxemblyStore maxRecIdPerHash;
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    while select Sha1, maxof(RecId)
+        #        from maxRecIdPerHash
+        #        group by Sha1
+        #    {
+        #        delete_from store
+        #            where store.Sha1  == maxRecIdPerHash.Sha1
+        #               && store.RecId != maxRecIdPerHash.RecId;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #run
+        #public void run()
+        #{
+        #    ;
+        #
+        #    super();
+        #    setprefix(this.caption());
+        #    switch (m_MaintenanceType)
+        #    {
+        #        case AxemblyStoreMaintenanceType::RemoveDuplicates:
+        #            this.removeDuplicates();
+        #            break;
+        #
+        #        case AxemblyStoreMaintenanceType::ClearStore:
+        #            this.clearStore();
+        #            break;
+        #
+        #        default:
+        #            throw error("Unsupported maintenace type");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #unpack
+        #public boolean unpack(container _packedObj)
+        #{
+        #    Version v;
+        #    boolean ret;
+        #    ;
+        #
+        #    v = RunBase::getVersion(_packedObj);
+        #    switch (v)
+        #    {
+        #        case #CurrentVersion:
+        #            [v, #CurrentList] = _packedObj;
+        #            ret = true;
+        #            break;
+        #
+        #        default:
+        #            ret = false;
+        #            break;
+        #    }
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #public static server AxemblyStoreMaintenance construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyStoreMaintenance();
+        #}
+      ENDSOURCE
+      SOURCE #description
+        #public static ClassDescription description()
+        #{
+        #    ;
+        #
+        #    //BP deviation documented
+        #    return "Maintain Axembly Store";
+        #}
+      ENDSOURCE
+      SOURCE #main
+        #public static void main(Args _args)
+        #{
+        #    AxemblyStoreMaintenance instance;
+        #    ;
+        #
+        #    instance = AxemblyStoreMaintenance::construct();
+        #    if (instance.prompt())
+        #    {
+        #        instance.run();
+        #    }
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxemblyType unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxemblyType
+    PROPERTIES
+      Name                #AxemblyType
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Represents a CLR type within an Axembly assembly.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final class AxemblyType
+        #{
+        #    System.Type m_ClrType;
+        #
+        #    #localmacro.AddIfNonDefault
+        #    if (!prmisdefault(%2))
+        #    {
+        #        %1.Add(%2);
+        #    }
+        #    #endmacro
+        #}
+      ENDSOURCE
+      SOURCE #createInstance
+        #public CLRObject createInstance(
+        #    anytype _arg1 = null,
+        #    anytype _arg2 = null,
+        #    anytype _arg3 = null,
+        #    anytype _arg4 = null,
+        #    anytype _arg5 = null,
+        #    anytype _arg6 = null,
+        #    anytype _arg7 = null,
+        #    anytype _arg8 = null,
+        #    anytype _arg9 = null)
+        #{
+        #    System.Collections.ArrayList args;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    args = new System.Collections.ArrayList(9);
+        #    #AddIfNonDefault(args, _arg1)
+        #    #AddIfNonDefault(args, _arg2)
+        #    #AddIfNonDefault(args, _arg3)
+        #    #AddIfNonDefault(args, _arg4)
+        #    #AddIfNonDefault(args, _arg5)
+        #    #AddIfNonDefault(args, _arg6)
+        #    #AddIfNonDefault(args, _arg7)
+        #    #AddIfNonDefault(args, _arg8)
+        #    #AddIfNonDefault(args, _arg9)
+        #    return System.Activator::CreateInstance(m_ClrType, args.ToArray());
+        #}
+      ENDSOURCE
+      SOURCE #getClrType
+        #public System.Type getClrType()
+        #{
+        #    ;
+        #
+        #    return m_ClrType;
+        #}
+      ENDSOURCE
+      SOURCE #getName
+        #public str getName()
+        #{
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #    return ClrInterop::getAnyTypeForObject(m_ClrType.get_Name());
+        #}
+      ENDSOURCE
+      SOURCE #invokeStatic
+        #public anytype invokeStatic(
+        #    str     _method,
+        #    anytype _arg1 = null,
+        #    anytype _arg2 = null,
+        #    anytype _arg3 = null,
+        #    anytype _arg4 = null,
+        #    anytype _arg5 = null,
+        #    anytype _arg6 = null,
+        #    anytype _arg7 = null,
+        #    anytype _arg8 = null,
+        #    anytype _arg9 = null)
+        #{
+        #    System.Reflection.MethodInfo methodInfo;
+        #    System.Collections.ArrayList args;
+        #    System.Type                  voidType;
+        #    ;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    args = new System.Collections.ArrayList(9);
+        #    #AddIfNonDefault(args, _arg1)
+        #    #AddIfNonDefault(args, _arg2)
+        #    #AddIfNonDefault(args, _arg3)
+        #    #AddIfNonDefault(args, _arg4)
+        #    #AddIfNonDefault(args, _arg5)
+        #    #AddIfNonDefault(args, _arg6)
+        #    #AddIfNonDefault(args, _arg7)
+        #    #AddIfNonDefault(args, _arg8)
+        #    #AddIfNonDefault(args, _arg9)
+        #
+        #    methodInfo = m_ClrType.GetMethod(_method);
+        #    voidType = AxemblyType::clrTypeVoid();
+        #    if (voidType.Equals(methodInfo.get_ReturnType()))
+        #    {
+        #        methodInfo.Invoke(null, args.ToArray());
+        #        return null;
+        #    }
+        #    else
+        #    {
+        #        return methodInfo.Invoke(null, args.ToArray());
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #setClrType
+        #private void setClrType(System.Type _clrType)
+        #{
+        #    ;
+        #
+        #    m_ClrType = _clrType;
+        #}
+      ENDSOURCE
+      SOURCE #clrTypeVoid
+        #private static System.Type clrTypeVoid()
+        #{
+        #    ;
+        #
+        #    return System.Type::GetType('System.Void');
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #private static server AxemblyType construct()
+        #{
+        #    ;
+        #
+        #    return new AxemblyType();
+        #}
+      ENDSOURCE
+      SOURCE #newFromClrType
+        #public static server AxemblyType newFromClrType(System.Type _clrType)
+        #{
+        #    AxemblyType instance;
+        #    ;
+        #
+        #    instance = AxemblyType::construct();
+        #    instance.setClrType(_clrType);
+        #    return instance;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: PRN
+
+; Microsoft Dynamics AX Project : Axembly unloaded
+; --------------------------------------------------------------------------------
+  PROJECTVERSION 2
+  
+  PROJECT #Axembly
+   PRIVATE
+  PROPERTIES
+    Name                #Axembly
+  ENDPROPERTIES
+  
+    PROJECTCLASS ProjectNode
+    GROUP #DataDictionary
+      PROPERTIES
+        Name                #DataDictionary
+        ProjectGroupType    #DataDictionary
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      GROUP #Macros
+        PROPERTIES
+          Name                #Macros
+          ProjectGroupType    #Macros
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 4
+          UTILOBJECTID 0
+          NODETYPE 218
+          NAME #Axembly
+        ENDNODE
+        ENDGROUP
+        
+      GROUP #Enums
+        PROPERTIES
+          Name                #Enums
+          ProjectGroupType    #BaseEnums
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 40
+          UTILOBJECTID 41053
+          NODETYPE 209
+          NAME #AxemblyStoreMaintenanceType
+        ENDNODE
+        ENDGROUP
+        
+      GROUP #EDTs
+        PROPERTIES
+          Name                #EDTs
+          ProjectGroupType    #ExtendedDataTypes
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 44437
+          NODETYPE 234
+          NAME #AxemblySha1
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 41
+          UTILOBJECTID 44436
+          NODETYPE 234
+          NAME #AxemblyBytesBase64
+        ENDNODE
+        ENDGROUP
+        
+      GROUP #Tables
+        PROPERTIES
+          Name                #Tables
+          ProjectGroupType    #Tables
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 44
+          UTILOBJECTID 42152
+          NODETYPE 204
+          NAME #AxemblyStore
+        ENDNODE
+        ENDGROUP
+        
+      ENDGROUP
+      
+    GROUP #Classes
+      PROPERTIES
+        Name                #Classes
+        ProjectGroupType    #Classes
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43992
+        NODETYPE 329
+        NAME #Axembly
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43993
+        NODETYPE 329
+        NAME #AxemblyAssembly
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43995
+        NODETYPE 329
+        NAME #AxemblyCompiler
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43994
+        NODETYPE 329
+        NAME #AxemblyCompilationResult
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43996
+        NODETYPE 329
+        NAME #AxemblySource
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43997
+        NODETYPE 329
+        NAME #AxemblyStoreMaintenance
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 43998
+        NODETYPE 329
+        NAME #AxemblyType
+      ENDNODE
+      ENDGROUP
+      
+  ENDPROJECT
+  
+
+***Element: END

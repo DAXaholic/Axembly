@@ -1,0 +1,235 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: Axembly unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #Axembly
+    PROPERTIES
+      Name                #Axembly
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///     Provides assemblies for Axembly sources either by retrieving them
+        #///     from cache or compiling them.
+        #/// </summary>
+        #/// <remarks>
+        #///     Copyright (c) 2017 Aaron Kunz
+        #///     https://github.com/DAXaholic/Axembly
+        #/// </remarks>
+        #final abstract class Axembly
+        #{
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #private void new()
+        #{
+        #    ;
+        #}
+      ENDSOURCE
+      SOURCE #assemblyCache
+        #private static server Map assemblyCache()
+        #{
+        #    SysGlobalCache cache;
+        #    ;
+        #
+        #    cache = classFactory.globalCache();
+        #    if (!cache.isSet(classstr(Axembly), staticmethodstr(Axembly, assemblyCache)))
+        #    {
+        #        cache.set(
+        #            classstr(Axembly),
+        #            staticmethodstr(Axembly, assemblyCache),
+        #            new Map(Types::String, Types::Class));
+        #    }
+        #    return cache.get(classstr(Axembly), staticmethodstr(Axembly, assemblyCache));
+        #}
+      ENDSOURCE
+      SOURCE #assemblyFromSource
+        #public static server AxemblyAssembly assemblyFromSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return Axembly::assemblyFromSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #assemblyFromSources
+        #public static server AxemblyAssembly assemblyFromSources(List _sources)
+        #{
+        #    AxemblySha1     sourceHash;
+        #    AxemblyAssembly assembly;
+        #    ;
+        #
+        #    sourceHash = AxemblySource::sha1FromSources(_sources);
+        #
+        #    assembly = Axembly::getCachedAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::getLoadedAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::getStoredAssemblyFromSourceHash(sourceHash);
+        #    if (assembly != null)
+        #    {
+        #        Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #        return assembly;
+        #    }
+        #
+        #    assembly = Axembly::buildAssemblyFromSources(_sources);
+        #    Axembly::storeAssemblyWithSourceHash(assembly, sourceHash);
+        #    Axembly::cacheAssemblyWithSourceHash(assembly, sourceHash);
+        #    return assembly;
+        #}
+      ENDSOURCE
+      SOURCE #buildAssemblyFromSource
+        #private static server AxemblyAssembly buildAssemblyFromSource(AxemblySource _source)
+        #{
+        #    List sources;
+        #    ;
+        #
+        #    sources = new List(Types::Class);
+        #    sources.addEnd(_source);
+        #    return Axembly::buildAssemblyFromSources(sources);
+        #}
+      ENDSOURCE
+      SOURCE #buildAssemblyFromSources
+        #private static server AxemblyAssembly buildAssemblyFromSources(List _sources)
+        #{
+        #    Enumerator               enmSources;
+        #    AxemblySource            firstSource;
+        #    AxemblyCompiler          compiler;
+        #    AxemblyCompilationResult compilationResult;
+        #    Enumerator               enmErrors;
+        #    ;
+        #
+        #    enmSources = _sources.getEnumerator();
+        #    if (!enmSources.moveNext())
+        #    {
+        #        throw error("Could not build assembly due to empty list of sources.");
+        #    }
+        #    firstSource = enmSources.current();
+        #
+        #    compiler = AxemblyCompiler::newFromLanguage(firstSource.getLanguage());
+        #    compilationResult = compiler.compileSources(_sources);
+        #    if (compilationResult.hasErrors())
+        #    {
+        #        enmErrors = compilationResult.getErrors().getEnumerator();
+        #        while (enmErrors.moveNext())
+        #        {
+        #            error(enmErrors.current());
+        #        }
+        #        throw error("Could not build assembly due to errors.");
+        #    }
+        #
+        #    return compilationResult.getAssembly();
+        #}
+      ENDSOURCE
+      SOURCE #cacheAssemblyWithSourceHash
+        #private static server void cacheAssemblyWithSourceHash(
+        #    AxemblyAssembly _assembly,
+        #    AxemblySha1     _sourceHash)
+        #{
+        #    Map cache;
+        #    ;
+        #
+        #    cache = Axembly::assemblyCache();
+        #    cache.insert(_sourceHash, _assembly);
+        #}
+      ENDSOURCE
+      SOURCE #getCachedAssemblyFromSourceHash
+        #private static server AxemblyAssembly getCachedAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    Map cache;
+        #    ;
+        #
+        #    cache = Axembly::assemblyCache();
+        #    if (cache.exists(_sourceHash))
+        #    {
+        #        return cache.lookup(_sourceHash);
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #getLoadedAssemblyFromSourceHash
+        #private static server AxemblyAssembly getLoadedAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    System.AppDomain               appDomain;
+        #    System.Reflection.Assembly[]   assemblies;
+        #    int                            assemblyCount;
+        #    int                            assemblyIdx;
+        #    System.Reflection.Assembly     assembly;
+        #    System.Reflection.AssemblyName assemblyName;
+        #    str                            name;
+        #    ;
+        #
+        #    appDomain = System.AppDomain::get_CurrentDomain();
+        #    assemblies = appDomain.GetAssemblies();
+        #
+        #    // -- Iterate backwards as new assemblies are located at the end
+        #    assemblyCount = assemblies.get_Length();
+        #    for (assemblyIdx = assemblyCount - 1;
+        #         assemblyIdx >= 0;
+        #         --assemblyIdx)
+        #    {
+        #        assembly = assemblies.GetValue(assemblyIdx);
+        #        assemblyName = assembly.GetName();
+        #        name = assemblyName.get_Name();
+        #        if (name == _sourceHash)
+        #        {
+        #            return AxemblyAssembly::newFromClrAssembly(assembly);
+        #        }
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #getStoredAssemblyFromSourceHash
+        #private static server AxemblyAssembly getStoredAssemblyFromSourceHash(AxemblySha1 _sourceHash)
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    store = AxemblyStore::findAnySha1(_sourceHash);
+        #    if (store.RecId != 0)
+        #    {
+        #        return AxemblyAssembly::newFromBytes(store.getAssemblyBytes());
+        #    }
+        #    return null;
+        #}
+      ENDSOURCE
+      SOURCE #storeAssemblyWithSourceHash
+        #private static server void storeAssemblyWithSourceHash(
+        #    AxemblyAssembly _assembly,
+        #    AxemblySha1     _sourceHash)
+        #{
+        #    AxemblyStore store;
+        #    ;
+        #
+        #    ttsbegin;
+        #    store.initValue();
+        #    store.setAssemblyBytes(_assembly.getBytes());
+        #    store.Sha1 = _sourceHash;
+        #    store.insert();
+        #    ttscommit;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

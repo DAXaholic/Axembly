@@ -1,0 +1,28 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: UTS
+
+; Microsoft Dynamics AX String: AxemblyBytesBase64 unloaded
+; --------------------------------------------------------------------------------
+  USERTYPEVERSION 6
+  
+  USERTYPE #AxemblyBytesBase64
+  STRING
+    PROPERTIES
+      Name                #AxemblyBytesBase64
+      Label               #Bytes Base64
+      HelpText            #Binary data encoded in Base64.
+      StringSize          #(Memo)
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+    ENDTYPEELEMENTS
+    
+    TYPEREFERENCES
+    ENDTYPEREFERENCES
+    
+  ENDUSERTYPE
+  
+
+***Element: END
