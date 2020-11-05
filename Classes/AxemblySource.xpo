@@ -26,8 +26,9 @@ Formatversion: 1
         #/// </remarks>
         #final class AxemblySource
         #{
-        #    str m_Source;
-        #    str m_Language;
+        #    str       m_Source;
+        #    str       m_Language;
+        #    container m_ReferencedAssemblies;
         #
         #    #Axembly
         #}
@@ -38,6 +39,14 @@ Formatversion: 1
         #    ;
         #
         #    return m_Language;
+        #}
+      ENDSOURCE
+      SOURCE #getReferencedAssemblies
+        #public container getReferencedAssemblies()
+        #{
+        #    ;
+        #
+        #    return m_ReferencedAssemblies;
         #}
       ENDSOURCE
       SOURCE #getSource
@@ -62,6 +71,14 @@ Formatversion: 1
         #    m_Language = _language;
         #}
       ENDSOURCE
+      SOURCE #setReferencedAssemblies
+        #private void setReferencedAssemblies(container _referencedAssemblies)
+        #{
+        #    ;
+        #
+        #    m_ReferencedAssemblies = _referencedAssemblies;
+        #}
+      ENDSOURCE
       SOURCE #setSource
         #private void setSource(str _source)
         #{
@@ -76,6 +93,9 @@ Formatversion: 1
         #    System.Text.StringBuilder concatenatedSources;
         #    Enumerator                enmSource;
         #    AxemblySource             source;
+        #    container                 referencedAssemblies;
+        #    int                       i;
+        #    str                       referencedAssembly;
         #    ;
         #
         #    concatenatedSources = new System.Text.StringBuilder();
@@ -83,7 +103,13 @@ Formatversion: 1
         #    while (enmSource.moveNext())
         #    {
         #        source = enmSource.current();
-        #        concatenatedSources.Append(source.getSource());
+        #        referencedAssemblies = source.getReferencedAssemblies();
+        #        for (i = 1; i <= conlen(referencedAssemblies); i++)
+        #        {
+        #            referencedAssembly = conpeek(referencedAssemblies, i);
+        #            concatenatedSources.AppendLine(referencedAssembly);
+        #        }
+        #        concatenatedSources.AppendLine(source.getSource());
         #    }
         #    return concatenatedSources.ToString();
         #}
@@ -113,10 +139,50 @@ Formatversion: 1
         #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageCs);
         #}
       ENDSOURCE
+      SOURCE #newFromCsSourceAndRefAssemblies
+        #/// <summary>
+        #///     Creates a new instance for a chunk of C# code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of C# code.
+        #/// </param>
+        #/// <param name="_referencedAssemblies">
+        #///     A container of strings representing references to additional assemblies the C# code
+        #///     needs in order to successfully compile.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromCsSourceAndRefAssemblies(
+        #    str       _source,
+        #    container _referencedAssemblies)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguageAndRefAssemblies(
+        #        _source,
+        #        #LanguageCs,
+        #        _referencedAssemblies);
+        #}
+      ENDSOURCE
       SOURCE #newFromSourceOfLanguage
         #public static server AxemblySource newFromSourceOfLanguage(
         #    str _source,
         #    str _language)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguageAndRefAssemblies(
+        #        _source,
+        #        _language,
+        #        connull());
+        #}
+      ENDSOURCE
+      SOURCE #newFromSourceOfLanguageAndRefAssemblies
+        #public static server AxemblySource newFromSourceOfLanguageAndRefAssemblies(
+        #    str       _source,
+        #    str       _language,
+        #    container _referencedAssemblies)
         #{
         #    AxemblySource instance;
         #    ;
@@ -124,6 +190,7 @@ Formatversion: 1
         #    instance = AxemblySource::construct();
         #    instance.setSource(_source);
         #    instance.setLanguage(_language);
+        #    instance.setReferencedAssemblies(_referencedAssemblies);
         #    return instance;
         #}
       ENDSOURCE
@@ -142,6 +209,32 @@ Formatversion: 1
         #    ;
         #
         #    return AxemblySource::newFromSourceOfLanguage(_source, #LanguageVb);
+        #}
+      ENDSOURCE
+      SOURCE #newFromVbSourceAndRefAssemblies
+        #/// <summary>
+        #///     Creates a new instance for a chunk of VB.NET code.
+        #/// </summary>
+        #/// <param name="_source">
+        #///     The string representing the chunk of VB.NET code.
+        #/// </param>
+        #/// <param name="_referencedAssemblies">
+        #///     A container of strings representing references to additional assemblies the VB.NET
+        #///     code needs in order to successfully compile.
+        #/// </param>
+        #/// <returns>
+        #///     The newly created instance.
+        #/// </returns>
+        #public static server AxemblySource newFromVbSourceAndRefAssemblies(
+        #    Source    _source,
+        #    container _referencedAssemblies)
+        #{
+        #    ;
+        #
+        #    return AxemblySource::newFromSourceOfLanguageAndRefAssemblies(
+        #        _source,
+        #        #LanguageVb,
+        #        _referencedAssemblies);
         #}
       ENDSOURCE
       SOURCE #sha1FromSources

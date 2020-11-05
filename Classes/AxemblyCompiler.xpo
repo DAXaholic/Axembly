@@ -16,6 +16,56 @@ Formatversion: 1
     
     METHODS
       Version: 3
+      SOURCE #buildCodeDomParameters
+        #private #CompilerNs(CompilerParameters) buildCodeDomParameters(
+        #    System.String   _outputFile,
+        #    System.String[] _referencedAssemblies)
+        #{
+        #    System.Collections.Specialized.StringCollection assemblyReferences;
+        #    #CompilerNs(CompilerParameters) ret;
+        #    ;
+        #
+        #    ret = new #CompilerNs(CompilerParameters)();
+        #    ret.set_IncludeDebugInformation(false);
+        #    ret.set_OutputAssembly(_outputFile);
+        #    assemblyReferences = ret.get_ReferencedAssemblies();
+        #    assemblyReferences.AddRange(_referencedAssemblies);
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #buildReferencedAssembliesArray
+        #private System.String[] buildReferencedAssembliesArray(List _sources)
+        #{
+        #    Set             distinctReferencedAssemblies;
+        #    Enumerator      enm;
+        #    AxemblySource   source;
+        #    container       referencedAssemblies;
+        #    int             idx;
+        #    System.String[] ret;
+        #    ;
+        #
+        #    distinctReferencedAssemblies = new Set(Types::String);
+        #    enm = _sources.getEnumerator();
+        #    while (enm.moveNext())
+        #    {
+        #        source = enm.current();
+        #        referencedAssemblies = source.getReferencedAssemblies();
+        #        for (idx = 1; idx <= conlen(referencedAssemblies); ++idx)
+        #        {
+        #            distinctReferencedAssemblies.add(conpeek(referencedAssemblies, idx));
+        #        }
+        #    }
+        #
+        #    ret = new System.String[distinctReferencedAssemblies.elements()]();
+        #    enm = distinctReferencedAssemblies.getEnumerator();
+        #    for (idx = 0; enm.moveNext(); ++idx)
+        #    {
+        #        ret.SetValue(enm.current(), idx);
+        #    }
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
       SOURCE #buildResultFromAssemblyFile
         #private AxemblyCompilationResult buildResultFromAssemblyFile(Filename _assemblyFile)
         #{
@@ -147,27 +197,31 @@ Formatversion: 1
       SOURCE #compileSourcesViaCodeDom
         #private AxemblyCompilationResult compileSourcesViaCodeDom(List _sources)
         #{
-        #    #CompilerNs(CodeDomProvider)    codeDomProvider;
-        #    System.String[]                 sourceStrings;
-        #    #CompilerNs(CompilerParameters) codeDomParameters;
         #    System.String                   tempDir;
         #    System.String                   sourceHash;
         #    System.String                   outputFile;
+        #    System.String[]                 referencedAssemblies;
+        #    System.String[]                 sourceStrings;
+        #    #CompilerNs(CompilerParameters) codeDomParameters;
+        #    #CompilerNs(CodeDomProvider)    codeDomProvider;
         #    #CompilerNs(CompilerResults)    codeDomResults;
         #    ;
         #
         #    new InteropPermission(InteropKind::ClrInterop).assert();
-        #    codeDomProvider = this.createCodeDomProvider();
-        #    sourceStrings = this.buildSourceStringArray(_sources);
-        #    codeDomParameters = new #CompilerNs(CompilerParameters)();
-        #    codeDomParameters.set_IncludeDebugInformation(false);
+        #
         #    tempDir = this.buildTempPathForCompilation();
         #    sourceHash = AxemblySource::sha1FromSources(_sources);
         #    outputFile = System.IO.Path::Combine(tempDir, sourceHash);
-        #    codeDomParameters.set_OutputAssembly(outputFile);
+        #
+        #    referencedAssemblies = this.buildReferencedAssembliesArray(_sources);
+        #    codeDomParameters = this.buildCodeDomParameters(outputFile, referencedAssemblies);
+        #    sourceStrings = this.buildSourceStringArray(_sources);
+        #
+        #    codeDomProvider = this.createCodeDomProvider();
         #    codeDomResults = codeDomProvider.CompileAssemblyFromSource(
         #        codeDomParameters,
         #        sourceStrings);
+        #
         #    return this.buildResultFromCodeDomResults(codeDomResults);
         #}
       ENDSOURCE
